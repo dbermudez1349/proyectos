@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Tareas;
+use App\Models\tareas;
 
 class HomeController extends Controller
 {
@@ -12,7 +12,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $tareas = Tareas::with('proyecto')->orderBy('estado')->get();
+        $tareas = tareas::with('proyecto')->orderBy('estado')->get();
         return view('home', compact('tareas'));
     }
 
