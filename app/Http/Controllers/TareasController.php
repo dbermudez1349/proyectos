@@ -64,28 +64,6 @@ class TareasController extends Controller
         return view('tareas.edit', compact('tarea', 'proyectos', 'usuarios'));
     }
 
-    public function update(Request $request, Tareas $tarea)
-    {
-        $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'proyecto_id' => 'required|exists:proyectos,id',
-            'usuario_id' => 'required|exists:users,id',
-            'estado' => 'required|in:Pendiente,Atrasada,Completada',
-            'fecha_limite' => 'nullable|date',
-            'archivo' => 'nullable|file|max:2048',
-        ]);
-
-        if ($request->hasFile('archivo')) {
-            $archivoPath = $request->file('archivo')->store('tareas', 'public');
-            $tarea->archivo = $archivoPath;
-        }
-
-        $tarea->update($request->except('archivo'));
-
-        return redirect()->route('tareas.index')->with('success', 'Tarea actualizada.');
-    }
-
     public function completar(Request $request, Tareas $tarea) {
         if (auth()->user()->id !== $tarea->usuario_id) {
             abort(403);
@@ -96,15 +74,24 @@ class TareasController extends Controller
             'archivos.*' => 'nullable|file|max:2048'
         ]);
 
-        $archivosPaths = [];
+        /*$archivosPaths = [];
         if ($request->hasFile('archivos')) {
             foreach ($request->file('archivos') as $archivo) {
                 $archivosPaths[] = $archivo->store('archivos');
             }
+        }*/
+        $archivoPath = null;
+        if ($request->hasFile('archivos')) {
+            $archivo = $request->file('archivos')[0]; // Tomamos solo el primer archivo
+            $nombreArchivo = time() . '_' . $archivo->getClientOriginalName(); // Generamos un nombre único con la extensión
+            $archivoPath = $archivo->storeAs('archivos', $nombreArchivo, 'public'); // Guardamos en `storage/app/public/archivos`
         }
 
+
+
         $tarea->update([
-            'estado' => 'Completada'
+            'estado' => 'Completada',
+            'archivo' => $archivoPath, // Guardamos la ruta del archivo
         ]);
 
         return redirect()->route('home')->with('success', 'Tarea completada con éxito.');
