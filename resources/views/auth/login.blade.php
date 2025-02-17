@@ -30,7 +30,7 @@
                       <div class="card" style="border-radius: 1rem;">
                         <div class="row g-0">
                           <div class="col-md-6 col-lg-5 d-none d-md-block">
-                            <img src="{{asset('img/fondologin.jpg')}}"
+                            <img src="{{asset('img/SISTEMA DE GESTION DE TAREAS.jpg')}}"
                               alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;" />
                           </div>
 
@@ -41,7 +41,7 @@
                                 @csrf
                                 <div class="d-flex align-items-center mb-3 pb-1">
                                   <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
-                                  <span class="h1 fw-bold mb-0"><img src="{{asset('img/logosv.png')}}" alt="" height="100px"></span>
+                                  <span class="h1 fw-bold mb-0"><img src="{{asset('img/LOGOS MUNICIPIO-v1.png')}}" alt="" height="100px"></span>
 
                                 </div>
 

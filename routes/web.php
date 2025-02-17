@@ -16,6 +16,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/tareas/{tarea}/completar', [TareasController::class, 'completar'])->name('tareas.completar');
     Route::post('/tareas/{tarea}/archivar', [TareasController::class, 'archivar'])->name('tareas.archivar');
 
+    Route::post('/tareas/{tarea}/actividad', [TareasController::class, 'agregarActividad'])->middleware('auth')->name('tareas.agregarActividad');
+    Route::get('/archivo', [TareasController::class, 'archivo'])->name('tareas.archivo');
+    Route::patch('/tareas/restaurar/{tarea}', [TareasController::class, 'restaurar'])->name('tareas.restaurar');
+
     Route::post('/logout', function() {
         Auth::logout();
         return redirect('/login');

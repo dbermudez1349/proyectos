@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('proyecto_id')->constrained()->onDelete('cascade');
             $table->string('titulo');
             $table->text('descripcion')->nullable();
-            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->enum('estado', ['Pendiente', 'Atrasada', 'Completada'])->default('Pendiente');
             $table->date('fecha_limite')->nullable();
             $table->boolean('archivar')->default(false);

@@ -1,22 +1,32 @@
 @extends('layouts.app')
+@push('styles')
+<link href="{{ asset('css/dataTables.bootstrap5.min.css') }}" rel="stylesheet">
+<link href="{{ asset('css/rowReorder.bootstrap5.min.css') }}" rel="stylesheet">
+@endpush
 @section('content')
 <div class="container">
-    <h2>Bienvenido al Gestor de Tareas</h2>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Gestor de Tareas</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <span class="nav-link">{{ Auth::user()->name }}</span>
-                    </li>
-                    <li class="nav-item">
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
-                        </form>
-                    </li>
-                </ul>
+            {{-- Breadcrumbs --}}
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}">Inicio</a></li>
+                    @if(request()->is('tareas'))
+                        <li class="breadcrumb-item active" aria-current="page">Tareas</li>
+                    @elseif(request()->is('tareas/*'))
+                        <li class="breadcrumb-item"><a href="{{ route('tareas.index') }}">Tareas</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+                    @endif
+                </ol>
+            </nav>
+
+            {{-- Usuario y Cerrar Sesión --}}
+            <div class="ms-auto d-flex align-items-center">
+                <span class="nav-link">{{ Auth::user()->name }}</span>
+                <form action="{{ route('logout') }}" method="POST" class="ms-3">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar Sesión</button>
+                </form>
             </div>
         </div>
     </nav>
@@ -32,25 +42,20 @@
                 </div>
             @endif
         </div>
-        <div class="col-md-3">
-            <div class="list-group">
-                <a href="{{ route('proyectos.create') }}" class="list-group-item list-group-item-action">Crear Proyecto</a>
-                <a href="{{ route('tareas.create') }}" class="list-group-item list-group-item-action">Crear Tarea</a>
-            </div>
-        </div>
-        <div class="col-md-9">
-            <h3>Bandeja de Tareas 2</h3>
+
+        <div class="col-md-12">
+            <h3>Bandeja de Tareas</h3>
             @if($tareas->isEmpty())
                 <div class="alert alert-info">No hay tareas registradas.</div>
             @else
-            <table class="table table-bordered">
+            <table class="table table-bordered" id="tabla-tareas">
                 <thead>
                     <tr>
                         <th>Título</th>
                         <th>Estado</th>
                         <th>Proyecto</th>
-                        <th>Asignado</th>
-                        <th>Acciones5</th>
+                        <th>Usuarios asignados</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,26 +74,23 @@
                                 @endif
 
                                 <td>{{ $tarea->proyecto->nombre ?? 'Sin Proyecto' }}</td>
-                                <td>{{ $tarea->usuario->name }}</td>
+                                <td>
+                                    @foreach ($tarea->usuarios as $us)
+                                        {{$us->name.' ; '}}
+                                    @endforeach
+                                </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        @if(auth()->user()->id === $tarea->usuario_id && $tarea->estado !== 'Completada')
+                                        @if(auth()->user()->id && $tarea->estado !== 'Completada')
                                             <a href="{{ route('tareas.show', $tarea->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
                                         @endif
 
                                         @if($tarea->estado === 'Completada')
-                                            <button class="btn btn-info btn-sm ver-detalle"
-                                                    data-id="{{ $tarea->id }}"
-                                                    data-nombre="{{ $tarea->titulo }}"
-                                                    data-estado="{{ $tarea->estado }}"
-                                                    data-proyecto="{{ $tarea->proyecto->nombre }}"
-                                                    data-usuario="{{ $tarea->usuario->name }}"
-                                                    data-descripcion="{{ $tarea->descripcion }}"
-                                                    data-archivo="{{ $tarea->archivo }}">
-                                                    <i class="bi bi-eye"></i> <!-- Ícono de ver -->
-                                            </button>
+                                            <a href="{{ route('tareas.show', $tarea->id) }}" class="btn btn-sm btn-info">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
                                             <form action="{{ route('tareas.archivar', $tarea->id) }}" method="POST" class="" onsubmit="return confirm('¿Estás seguro de archivar esta tarea?');">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-warning"><i class="bi bi-archive"></i></button>
@@ -133,6 +135,14 @@
 
 @endsection
 @push('scripts')
+ <!-- jQuery -->
+<script src="{{ asset('js/jquery-3.5.1.js') }}"></script>
+<!-- DataTables -->
+
+<script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('js/dataTables.rowReorder.min.js') }}"></script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll(".ver-detalle").forEach(button => {
@@ -163,6 +173,26 @@
                 var modal = new bootstrap.Modal(document.getElementById("modalDetalle"));
                 modal.show();
             });
+        });
+    });
+</script>
+<script>
+
+    $(document).ready(function(){
+        ttareas = $("#tabla-tareas").DataTable({
+            "lengthMenu": [ 5, 10],
+            "language" : {
+                "url": '{{ asset("/js/spanish.json") }}',
+            },
+            "autoWidth": true,
+            "rowReorder": false,
+            "order": [], //Initial no order
+            "processing" : false,
+            "serverSide": false,
+
+            //"columnDefs": [{ targets: [3], "orderable": false}],
+
+            "fixedColumns" : true
         });
     });
 </script>

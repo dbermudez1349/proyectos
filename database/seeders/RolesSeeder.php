@@ -17,16 +17,24 @@ class RolesSeeder extends Seeder
           // Crear roles
           $admin = Role::firstOrCreate(['name' => 'Administrador']);
           $director = Role::firstOrCreate(['name' => 'Director']);
+          $coordinador = Role::firstOrCreate(['name' => 'Coordinador']);
+          $alcalde = Role::firstOrCreate(['name' => 'Alcalde']);
 
           // Permisos
           Permission::firstOrCreate(['name' => 'ver proyectos']);
           Permission::firstOrCreate(['name' => 'crear proyectos']);
           Permission::firstOrCreate(['name' => 'crear tareas']);
-          Permission::firstOrCreate(['name' => 'ver tareas propias']);
-          Permission::firstOrCreate(['name' => 'realizar tareas']);
+          Permission::firstOrCreate(['name' => 'ver tareas asignadas']);
+          Permission::firstOrCreate(['name' => 'ver tareas detalladas']);
+          Permission::firstOrCreate(['name' => 'completar tareas']);
+          Permission::firstOrCreate(['name' => 'añadir actividades']);
+          Permission::firstOrCreate(['name' => 'tablero de tareas']);
+          Permission::firstOrCreate(['name' => 'tareas archivadas']);
 
           // Asignar permisos a roles
-          $admin->givePermissionTo(['ver proyectos', 'crear proyectos', 'crear tareas']);
-          $director->givePermissionTo(['ver tareas propias', 'realizar tareas']);
+          $admin->givePermissionTo(['ver proyectos', 'crear proyectos', 'crear tareas','ver tareas asignadas','completar tareas','añadir actividades','tablero de tareas','tareas archivadas']);
+          $director->givePermissionTo(['ver tareas asignadas', 'completar tareas','añadir actividades']);
+          $alcalde->givePermissionTo(['ver tareas asignadas', 'ver tareas detalladas','tablero de tareas','añadir actividades']);
+          $coordinador->givePermissionTo(['ver proyectos', 'crear proyectos', 'crear tareas','ver tareas asignadas','añadir actividades','tablero de tareas','tareas archivadas']);
     }
 }

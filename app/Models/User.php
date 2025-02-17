@@ -47,4 +47,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function tareas()
+    {
+        return $this->belongsToMany(tareas::class, 'tarea_usuario','usuario_id','tarea_id');
+    }
 }

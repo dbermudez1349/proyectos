@@ -19,38 +19,9 @@ class TareasController extends Controller
         {
             abort(403, 'No tienes acceso a esta seccion.');
         }
-        $query = tareas::query();
-
-    // Aplicar filtros si están presentes
-    if ($request->filled('usuario')) {
-        $query->whereHas('usuarios', function ($q) use ($request) {
-            $q->where('users.id', $request->usuario);
-        });
-    }
-
-    if ($request->filled('proyecto')) {
-        $query->where('proyecto_id', $request->proyecto);
-    }
-
-    if ($request->filled('fecha')) {
-        $query->whereDate('fecha_limite', '=', $request->fecha);
-    }
-
-    if ($request->filled('estado')) {
-        $query->where('estado', $request->estado);
-    }
-
-    // Obtener las tareas con relaciones para optimizar la vista
-    $tareas = $query->with(['usuarios', 'proyecto'])->get();
-
-    // Obtener listas de usuarios y proyectos para los selects
-    $usuarios = User::all();
-    $proyectos = Proyectos::all();
-
-    // Vista seleccionada (por defecto 'kanban')
-    $view = $request->get('view', 'kanban');
-
-    return view('tareas.index', compact('tareas', 'usuarios', 'proyectos', 'view'));
+        $view = $request->query('view', 'kanban'); // Vista por defecto: Kanban
+        $tareas = tareas::with('usuarios')->get();
+        return view('tareas.index', compact('tareas', 'view'));
     }
 
     public function create() {
@@ -89,9 +60,9 @@ class TareasController extends Controller
         foreach ($usuariosIds as $usuarioId) {
             // Realizar alguna operación con cada usuario, como asociarlo a la tarea
             $tarea->usuarios()->attach($usuarioId);
-            //$usuario = User::find($usuarioId);
-            //$usuario->notify(new TareaCreada($tarea));
-            //Notification::send($usuario, new TareaAsignada($tarea));
+            $usuario = User::find($usuarioId);
+            $usuario->notify(new TareaCreada($tarea));
+            Notification::send($usuario, new TareaAsignada($tarea));
         }
 
         //$usuario = User::find($request->usuario_id);
@@ -142,7 +113,7 @@ class TareasController extends Controller
         $archivosPaths = [];
         if ($request->hasFile('archivos')) {
             foreach ($request->file('archivos') as $archivo) {
-                $archivosPaths[] = $archivo->store('archivos', 'public');
+                $archivosPaths[] = $archivo->store('archivos','public');
             }
         }
 

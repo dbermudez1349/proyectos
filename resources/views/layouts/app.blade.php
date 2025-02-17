@@ -12,7 +12,7 @@
     <script src="{{ asset('js/bootstrap53.bundle.min.js') }}" defer></script>
     <script src="{{ asset('js/axios.min.js') }}" defer></script>
 </head>
-<body>
+<body  class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">Gestor de Tareas</a>
@@ -21,17 +21,26 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    @hasrole('Administrador')
+                    @can('tablero de tareas')
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('tablero') }}">Tablero</a>
+                        <a class="nav-link" href="{{ route('tareas.index') }}">Tablero</a>
                     </li>
+                    @endcan
+                    @can('ver proyectos')
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('proyectos.index') }}">Proyectos</a>
                     </li>
+                    @endcan
+                    @can('crear tareas')
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('tareas.create') }}">Crear Tarea</a>
                     </li>
-                    @endhasrole
+                    @endcan
+                    @can('tareas archivadas')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('tareas.archivo') }}">Tareas archivadas</a>
+                    </li>
+                    @endcan
                 </ul>
             </div>
         </div>

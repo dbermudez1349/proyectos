@@ -12,7 +12,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $tareas = tareas::with('proyecto')->where("usuario_id", auth()->user()->id)->orderBy('estado')->get();
+        $tareas = auth()->user()->tareas()->get();
         return view('home', compact('tareas'));
     }
 

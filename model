@@ -1,0 +1,12 @@
+
+Warning: PHP Startup: Unable to load dynamic library 'php_sqlsrv_82_nts_x86.dll' (tried: C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_sqlsrv_82_nts_x86.dll (%1 is not a valid Win32 application), C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_php_sqlsrv_82_nts_x86.dll.dll (The specified module could not be found)) in Unknown on line 0
+
+Warning: PHP Startup: Unable to load dynamic library 'php_sqlsrv_82_ts_x64.dll' (tried: C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_sqlsrv_82_ts_x64.dll (The specified module could not be found), C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_php_sqlsrv_82_ts_x64.dll.dll (The specified module could not be found)) in Unknown on line 0
+
+Warning: PHP Startup: Unable to load dynamic library 'php_sqlsrv_82_ts_x86.dll' (tried: C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_sqlsrv_82_ts_x86.dll (%1 is not a valid Win32 application), C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_php_sqlsrv_82_ts_x86.dll.dll (The specified module could not be found)) in Unknown on line 0
+
+Warning: PHP Startup: Unable to load dynamic library 'php_pdo_sqlsrv_82_nts_x86.dll' (tried: C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_pdo_sqlsrv_82_nts_x86.dll (%1 is not a valid Win32 application), C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_php_pdo_sqlsrv_82_nts_x86.dll.dll (The specified module could not be found)) in Unknown on line 0
+
+Warning: PHP Startup: Unable to load dynamic library 'php_pdo_sqlsrv_82_ts_x64.dll' (tried: C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_pdo_sqlsrv_82_ts_x64.dll (The specified module could not be found), C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_php_pdo_sqlsrv_82_ts_x64.dll.dll (The specified module could not be found)) in Unknown on line 0
+
+Warning: PHP Startup: Unable to load dynamic library 'php_pdo_sqlsrv_82_ts_x86.dll' (tried: C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_pdo_sqlsrv_82_ts_x86.dll (%1 is not a valid Win32 application), C:/laragon/bin/php/php-8.2.13-nts-Win32-vs16-x64/ext\php_php_pdo_sqlsrv_82_ts_x86.dll.dll (The specified module could not be found)) in Unknown on line 0
