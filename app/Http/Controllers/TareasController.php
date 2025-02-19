@@ -51,7 +51,7 @@ class TareasController extends Controller
         ]);
 
         $usuario = User::find($request->usuario_id);
-        //$usuario->notify(new TareaCreada($tarea));
+        $usuario->notify(new TareaCreada($tarea));
         //Notification::send($usuario, new TareaAsignada($tarea));
 
         return redirect()->route('home')->with('success', 'Tarea creada y asignada correctamente.');
