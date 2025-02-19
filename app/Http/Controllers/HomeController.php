@@ -12,8 +12,15 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $tareas = tareas::with('proyecto')->orderBy('estado')->get();
+        $tareas = tareas::with('proyecto')->where("usuario_id", auth()->user()->id)->orderBy('estado')->get();
         return view('home', compact('tareas'));
+    }
+
+
+    public function tablero()
+    {
+        $tareas = tareas::with('proyecto')->orderBy('estado')->get();
+        return view('tablero', compact('tareas'));
     }
 
     /**

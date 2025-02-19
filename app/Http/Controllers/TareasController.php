@@ -7,6 +7,8 @@ use App\Models\Proyectos;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\TareaCreada;
+use Illuminate\Support\Facades\Notification;
 
 
 class TareasController extends Controller
@@ -49,6 +51,7 @@ class TareasController extends Controller
         ]);
 
         $usuario = User::find($request->usuario_id);
+        $usuario->notify(new TareaCreada($tarea));
         //Notification::send($usuario, new TareaAsignada($tarea));
 
         return redirect()->route('home')->with('success', 'Tarea creada y asignada correctamente.');
@@ -83,9 +86,48 @@ class TareasController extends Controller
         return redirect()->route('tareas.index')->with('success', 'Tarea actualizada.');
     }
 
+    public function completar(Request $request, Tareas $tarea) {
+        if (auth()->user()->id !== $tarea->usuario_id) {
+            abort(403);
+        }
+
+        $request->validate([
+            'comentario' => 'required|string',
+            'archivos.*' => 'nullable|file|max:2048'
+        ]);
+
+        $archivosPaths = [];
+        if ($request->hasFile('archivos')) {
+            foreach ($request->file('archivos') as $archivo) {
+                $archivosPaths[] = $archivo->store('archivos');
+            }
+        }
+
+        $tarea->update([
+            'estado' => 'Completada'
+        ]);
+
+        return redirect()->route('home')->with('success', 'Tarea completada con éxito.');
+    }
+
+    public function show(tareas $tarea) {
+        if (auth()->user()->id !== $tarea->usuario_id) {
+            abort(403);
+        }
+        return view('tareas.show', compact('tarea'));
+    }
+
     public function destroy(Tareas $tarea)
     {
         $tarea->delete();
         return redirect()->route('tareas.index')->with('success', 'Tarea eliminada.');
+    }
+
+    public function archivar(tareas $tarea) {
+        if ($tarea->estado !== 'Completada') {
+            return redirect()->back()->with('error', 'Solo se pueden archivar tareas completadas.');
+        }
+        $tarea->update(['archivar' => 1]);
+        return redirect()->route('home')->with('success', 'Tarea archivada con éxito.');
     }
 }

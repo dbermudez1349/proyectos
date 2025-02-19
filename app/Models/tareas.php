@@ -9,7 +9,7 @@ class tareas extends Model
 {
     use HasFactory;
     protected $table = 'tareas';
-    protected $fillable = ['proyecto_id', 'titulo', 'descripcion', 'usuario_id', 'estado', 'fecha_limite', 'archivo'];
+    protected $fillable = ['proyecto_id', 'titulo', 'descripcion', 'usuario_id', 'estado', 'fecha_limite', 'archivo', 'archivar'];
     public function proyecto() {
         return $this->belongsTo(Proyectos::class);
     }

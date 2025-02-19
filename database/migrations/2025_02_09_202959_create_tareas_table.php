@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->enum('estado', ['Pendiente', 'Atrasada', 'Completada'])->default('Pendiente');
             $table->date('fecha_limite')->nullable();
+            $table->boolean('archivar')->default(false);
             $table->string('archivo')->nullable();
             $table->timestamps();
         });
