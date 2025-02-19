@@ -38,12 +38,12 @@ class TareaCreada extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-        ->subject('Nueva Tarea Asignada')
-        ->greeting('Hola ' . $notifiable->name . ',')
-        ->line('Se te ha asignado una nueva tarea: "' . $this->tarea->titulo . '".')
-        ->line('Descripción: ' . $this->tarea->descripcion)
-        ->action('Ver Tarea', url('/tareas/' . $this->tarea->id))
-        ->line('Por favor revisa y completa la tarea antes de la fecha límite.');
+                        ->subject('Nueva Tarea Asignada')
+                        ->greeting('Hola ' . $notifiable->name . ',')
+                        ->line('Se te ha asignado una nueva tarea: "' . $this->tarea->titulo . '".')
+                        ->line('Descripción: ' . $this->tarea->descripcion)
+                        ->action('Ver Tarea', url('/tareas/' . $this->tarea->id))
+                        ->line('Por favor revisa y completa la tarea antes de la fecha límite.');
     }
 
     /**

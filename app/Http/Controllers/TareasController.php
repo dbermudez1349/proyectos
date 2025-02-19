@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\tareas;
-use App\Models\Proyectos;
+use App\Models\proyectos;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +23,7 @@ class TareasController extends Controller
     }
 
     public function create() {
-        $proyectos = Proyectos::all();
+        $proyectos = proyectos::all();
         $usuarios = User::all();
         return view('tareas.create', compact('proyectos', 'usuarios'));
     }
@@ -51,7 +51,7 @@ class TareasController extends Controller
         ]);
 
         $usuario = User::find($request->usuario_id);
-        $usuario->notify(new TareaCreada($tarea));
+        //$usuario->notify(new TareaCreada($tarea));
         //Notification::send($usuario, new TareaAsignada($tarea));
 
         return redirect()->route('home')->with('success', 'Tarea creada y asignada correctamente.');
