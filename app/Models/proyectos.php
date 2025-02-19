@@ -11,6 +11,6 @@ class proyectos extends Model
     use HasFactory;
     protected $fillable = ['nombre', 'descripcion'];
     public function tareas() {
-        return $this->hasMany(Tareas::class);
+        return $this->hasMany(tareas::class);
     }
 }
