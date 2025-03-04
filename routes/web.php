@@ -20,6 +20,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/archivo', [TareasController::class, 'archivo'])->name('tareas.archivo');
     Route::patch('/tareas/restaurar/{tarea}', [TareasController::class, 'restaurar'])->name('tareas.restaurar');
 
+    Route::get('/actividades/{id}/{archivoIndex}', [TareasController::class, 'descargarArchivo'])
+    ->name('actividades.descargar');
+
     Route::post('/logout', function() {
         Auth::logout();
         return redirect('/login');

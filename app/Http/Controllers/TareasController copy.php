@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\tareas;
 use App\Models\proyectos;
 use App\Models\User;
+use App\Models\actividad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\TareaCreada;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class TareasController extends Controller
@@ -153,6 +156,29 @@ class TareasController extends Controller
     {
         $tarea->update(['estado' => 'pendiente']);
         return redirect()->route('tareas.archivo')->with('success', 'Tarea restaurada con éxito.');
+    }
+
+    public function descargarArchivo($id)
+    {
+        $actividad = actividad::findOrFail($id);
+
+        // Verificar si hay archivos adjuntos
+        if (!$actividad->archivos || count($actividad->archivos) === 0) {
+            abort(404, 'No hay archivos disponibles para esta actividad.');
+        }
+
+        // Tomar el primer archivo del array (si hay varios, se puede modificar la lógica)
+        $archivo = $actividad->archivos[0];
+
+        // Verificar que el archivo existe en el storage
+        if (!Storage::exists($archivo)) {
+            abort(404, 'El archivo no existe en el servidor.');
+        }
+
+        // Generar un nombre limpio para la descarga
+        $slug = Str::slug(pathinfo($archivo, PATHINFO_FILENAME)) . '.' . pathinfo($archivo, PATHINFO_EXTENSION);
+
+        return Storage::download($archivo, $slug);
     }
 
 }

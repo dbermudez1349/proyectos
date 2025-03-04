@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\tareas;
 use App\Models\proyectos;
 use App\Models\User;
+use App\Models\actividad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\TareaCreada;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class TareasController extends Controller
@@ -89,11 +92,17 @@ class TareasController extends Controller
         foreach ($usuariosIds as $usuarioId) {
             // Realizar alguna operación con cada usuario, como asociarlo a la tarea
             $tarea->usuarios()->attach($usuarioId);
-            //$usuario = User::find($usuarioId);
-            //$usuario->notify(new TareaCreada($tarea));
-            //Notification::send($usuario, new TareaAsignada($tarea));
+            $usuario = User::find($usuarioId);
+            $usuario->notify(new TareaCreada($tarea));
+            //Notification::send($usuario, new TareaCreada($tarea));
         }
-
+        //Creacion de actividad inicial
+        $tarea->actividades()->create([
+            'usuario_id' => auth()->id(),
+            'comentario' => 'Tarea creada y asignada',
+            'archivos' => null,
+            'tipo' => 'Comentario',
+        ]);
         //$usuario = User::find($request->usuario_id);
         //$usuario->notify(new TareaCreada($tarea));
         //Notification::send($usuario, new TareaAsignada($tarea));
@@ -149,7 +158,8 @@ class TareasController extends Controller
         $tarea->actividades()->create([
             'usuario_id' => auth()->id(),
             'comentario' => $request->comentario,
-            'archivos' => count($archivosPaths) ? $archivosPaths : null,
+            //'archivos' => count($archivosPaths) ? $archivosPaths : null,
+            'archivos' => count($archivosPaths) ? json_encode($archivosPaths) : json_encode([]),
             'tipo' => $request->comentario ? 'Comentario' : 'Archivo',
         ]);
 
@@ -183,5 +193,33 @@ class TareasController extends Controller
         $tarea->update(['estado' => 'pendiente']);
         return redirect()->route('tareas.archivo')->with('success', 'Tarea restaurada con éxito.');
     }
+
+    public function descargarArchivo($id, $archivoIndex = 0)
+    {
+        $actividad = actividad::find($id);
+
+        // Verificar que la actividad exista y tenga un archivo
+        if (!$actividad || !$actividad->archivos) {
+            return response()->json(['error' => 'Archivo no encontrado'], 404);
+        }
+
+        // Decodificar la lista de archivos de la actividad
+        $archivos = json_decode($actividad->archivos, true);
+
+        if (!isset($archivos[$archivoIndex]) || !Storage::disk('public')->exists($archivos[$archivoIndex])) {
+            return response()->json(['error' => 'Archivo no encontrado'], 404);
+        }
+
+        $path = $archivos[$archivoIndex];
+
+        // Obtener la extensión real del archivo
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+
+        // Nombre limpio para la descarga
+        $slug = Str::slug(pathinfo($path, PATHINFO_FILENAME)) . '.' . $extension;
+
+        return Storage::disk('public')->download($path, $slug);
+    }
+
 
 }

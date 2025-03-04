@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('titulo');
             $table->text('descripcion')->nullable();
             $table->enum('estado', ['Pendiente', 'Atrasada', 'Completada'])->default('Pendiente');
-            $table->date('fecha_limite')->nullable();
+            $table->dateTime('fecha_limite')->nullable();
             $table->boolean('archivar')->default(false);
             $table->string('archivo')->nullable();
             $table->timestamps();

@@ -8,10 +8,9 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\tareas;
 
-class TareaCreada extends Notification implements ShouldQueue
+class TareaRetrasada extends Notification
 {
     use Queueable;
-
     protected $tarea;
 
     /**
@@ -38,12 +37,11 @@ class TareaCreada extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                        ->subject('Nueva Tarea Asignada')
-                        ->greeting('Hola ' . $notifiable->name . ',')
-                        ->line('Se te ha asignado una nueva tarea: "' . $this->tarea->titulo . '".')
-                        ->line('Descripción: ' . $this->tarea->descripcion)
-                        ->action('Ver Tarea', url('/tareas/' . $this->tarea->id))
-                        ->line('Por favor revisa y completa la tarea antes de la fecha límite.');
+                    ->subject('⚠️ Tarea Retrasada: ' . $this->tarea->titulo)
+                    ->greeting('Hola ' . $notifiable->name . ',')
+                    ->line('La tarea "' . $this->tarea->titulo . '" ha pasado su fecha límite y se ha marcado como retrasada.')
+                    ->action('Ver Tarea', url('/tareas/' . $this->tarea->id))
+                    ->line('Por favor revisa y completa la tarea antes de la fecha límite.');
     }
 
     /**

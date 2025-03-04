@@ -34,6 +34,7 @@
             @endcan
         @endif
         <div class="chat-box" style="max-height: 400px; overflow-y: auto;">
+
             @forelse($tarea->actividades as $actividad)
                 <div class="d-flex align-items-start mb-3">
                     <div class="me-2">
@@ -46,13 +47,18 @@
                         @if($actividad->archivos)
                             <p class="mb-0"><strong><i class="bi bi-paperclip"></i> Archivos adjuntos:</strong></p>
                             <ul class="list-unstyled">
-                                @foreach($actividad->archivos as $archivo)
-                                    <li>
-                                        <a href="{{ Storage::url($archivo) }}" target="_blank" class="text-primary">
-                                            <i class="bi bi-file-earmark"></i> Ver archivo
-                                        </a>
-                                    </li>
+                                @php
+                                    $archivos = is_array($actividad->archivos) ? $actividad->archivos : json_decode($actividad->archivos, true);
+                                    if (!is_array($archivos)) {
+                                        $archivos = []; // Evita errores en el foreach
+                                    }
+                                @endphp
+                                @foreach($archivos as $index => $archivo)
+                                    <a href="{{ route('actividades.descargar', ['id' => $actividad->id, 'archivoIndex' => $index]) }}">
+                                        Descargar
+                                    </a><br>
                                 @endforeach
+
                             </ul>
                         @endif
                     </div>
