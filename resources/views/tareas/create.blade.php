@@ -1,74 +1,121 @@
 @extends('layouts.app')
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
-<link rel="stylesheet" href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" />
-@endpush
+
 @section('content')
-<div class="container">
-    <h2>Crear Nueva Tarea</h2>
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    
+    <section class="content-header" id="arriba">
+        <h1>
+            Nueva Tarea 
+        </h1>
 
-    <form action="{{ route('tareas.store') }}" method="POST">
-        @csrf
-        <div class="mb-3">
-            <label for="titulo" class="form-label">Título</label>
-            <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Tarea de ejemplo" required>
-        </div>
+    </section>
 
+    <section class="content" id="content_form">
 
-        <div class="mb-3">
-            <label for="descripcion" class="form-label">Descripción</label>
-            <textarea class="form-control" id="descripcion" name="descripcion" placeholder="Descripcion de tarea de ejemplo"></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="usuarios" class="form-label">Asignar a Usuarios</label>
-            <select class="form-select" id="usuarios" name="usuarios2[]" data-placeholder="seleccione usuarios" multiple>
-                @foreach ($usuarios as $usuario)
-                    <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
-                @endforeach
-            </select>
-        </div>
+        <div class="box" id="listado_persona">
+            <div class="box-header with-border">
+                <h3 class="box-title" id="tituloCabecera"> </h3>
 
-        <div class="mb-3">
-            <label for="proyecto_id" class="form-label">Proyecto</label>
-            <select class="form-control" id="proyecto_id" name="proyecto_id" required>
-                @foreach($proyectos as $proyecto)
-                    <option value="{{ $proyecto->id }}">{{ $proyecto->nombre }}</option>
-                @endforeach
-            </select>
-        </div>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip"
+                        title="Collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    
+                </div>
 
-        <div class="mb-3">
-            <label for="fecha_limite" class="form-label">Fecha Límite</label>
-            <input type="datetime-local" class="form-control" id="fecha_limite" name="fecha_limite">
+              
+            </div>
+            <div class="box-body">
+
+              
+
+                    <form class="form-horizontal" id="form_tareas" autocomplete="off" method="post"
+                        action="">
+                        {{ csrf_field() }}
+
+                        <div class="form-group">
+
+                            <label for="inputPassword3" class="col-sm-3 control-label">Titulo</label>
+                            <div class="col-sm-8">
+                                <input type="text" minlength="1" maxlength="100" onKeyPress="if(this.value.length==100) return false;" class="form-control proy_class" id="titulo" name="titulo" placeholder="Titulo">
+                            </div>
+                        
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="inputPassword3" class="col-sm-3 control-label">Descripción</label>
+                            <div class="col-sm-8">
+                                <textarea minlength="1" maxlength="300" onKeyPress="if(this.value.length==300) return false;" class="form-control proy_class" id="descripcion" name="descripcion" placeholder="Descripción"></textarea>
+                            </div>
+                        
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-3 control-label">Asignar Area</label>
+                            <div class="col-sm-8">
+                                <select data-placeholder="Seleccione Una Area"  multiple="multiple" style="width: 100%;" class="form-control select2 proy_class1" name="areas[]" id="areas" >
+                                    @foreach ($area as $dato)
+                                        <option value=""></option>
+                                        <option value="{{ $dato->id}}" >{{ $dato->descripcion }} </option>
+                                    @endforeach                                           
+                                    
+                                </select>                                    
+                            </div>                                
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-3 control-label">Proyecto</label>
+                            <div class="col-sm-8">
+                                <select data-placeholder="Seleccione Un Proyecto " style="width: 100%;" class="form-control select2 proy_class2" name="proyecto" id="proyecto" >
+                                    
+                                </select>                                    
+                            </div>                                
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="inputPassword3" class="col-sm-3 control-label">Fecha Limite</label>
+                            <div class="col-sm-8">
+                                <input type="date"  class="form-control proy_class" id="flimite" name="flimite" placeholder="Titulo">
+                            </div>
+                        
+                        </div>
+
+                        <hr>
+                        <div class="form-group">
+                            <div class="col-sm-12 text-center" >
+                            
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Guardar
+                                </button>
+                                <button type="button" onclick="limpiarCampos()" class="btn btn-warning btn-sm">
+                                    Cancelar
+                                </button>
+                                
+                            </div>
+                        </div>
+                            
+                           
+                    
+                    </form>
+
+                
+            </div>
         </div>
-        <br>
-        <button type="submit" class="btn btn-primary mb-5">Crear Tarea</button>
-    </form>
-</div>
+    </section>
 @endsection
-@push('scripts')
- <!-- jQuery -->
- <script src="{{ asset('js/jquery-3.5.1.js') }}"></script>
-<script>
-    $(document).ready(function(){
-        $( '#usuarios' ).select2( {
-            theme: "bootstrap-5",
-            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
-            placeholder: $( this ).data( 'placeholder' ),
-            closeOnSelect: false,
-        } );
-    })
+@section('scripts')
 
-</script>
-<script src="{{ asset('js/select2.min.js') }}"></script>
-@endpush
+    <script src="{{ asset('js/tarea/generar.js?v='.rand())}}"></script>
+    <script>
+        $('#tituloCabecera').html('Buscar')
+        const hoy = new Date().toISOString().split('T')[0];
+    
+        // Asignarla como valor mínimo al input
+        document.getElementById('flimite').setAttribute('min', hoy);
+       
+    </script>
+
+@endsection

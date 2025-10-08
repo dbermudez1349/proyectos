@@ -52,7 +52,8 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'https://sanvicente.gob.ec/proyectos'),
+    // 'url' => env('APP_URL', 'https://sanvicente.gob.ec/proyectos'),
+     'url' => env('APP_URL', 'localhost'),
 
     /*
     |--------------------------------------------------------------------------

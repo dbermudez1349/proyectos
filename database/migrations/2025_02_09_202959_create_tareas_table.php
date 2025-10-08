@@ -16,11 +16,13 @@ return new class extends Migration
             $table->foreignId('proyecto_id')->constrained()->onDelete('cascade');
             $table->string('titulo');
             $table->text('descripcion')->nullable();
-            $table->enum('estado', ['Pendiente', 'Atrasada', 'Completada'])->default('Pendiente');
+            $table->enum('estado', ['Pendiente', 'Atrasada', 'Completada', 'En Proceso'])->default('Pendiente');
             $table->dateTime('fecha_limite')->nullable();
             $table->boolean('archivar')->default(false);
             $table->string('archivo')->nullable();
             $table->timestamps();
+            $table->integer('id_usuario_reg');
+            $table->integer('id_usuario_act');
         });
     }
 

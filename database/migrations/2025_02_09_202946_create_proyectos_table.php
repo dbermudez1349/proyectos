@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->text('descripcion')->nullable();
+            $table->integer('estado');
+            $table->integer('id_usuario_reg');
+            $table->integer('id_usuario_act');
+            $table->integer('id_usuario_elimina');
             $table->timestamps();
         });
     }
