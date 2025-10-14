@@ -117,6 +117,10 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <img src="{{ asset('dist/img/use.png')}}" class="user-image" alt="User Image">
                                 <span class="hidden-xs">
+                                    @guest
+                                    @else
+                                        {{ Auth::user()->area->descripcion}}</span>
+                                    @endguest
                                    
                             </a>
                             <ul class="dropdown-menu">
@@ -125,6 +129,10 @@
                                     
                                     <img src="{{ asset('dist/img/use.png')}}" class="img-circle" alt="User Image">
                                     <p>
+                                        @guest
+                                        @else
+                                            {{ Auth::user()->area->descripcion}}
+                                        @endguest
                                       
                                     </p>
                                 </li>
@@ -167,6 +175,10 @@
                         <img src="{{ asset('dist/img/use.png')}}" class="img-circle" alt="User Image">
                     </div>
                     <div class="pull-left info">
+                         @guest
+                        @else
+                            <p>  {{ Auth::user()->area->descripcion}}</p>
+                        @endguest
                        
                         <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
                     </div>
@@ -174,7 +186,8 @@
                
                 <!-- sidebar menu: : style can be found in sidebar.less -->
                 <ul class="sidebar-menu tree" data-widget="tree" style="margin-top: 12px">
-                                  
+                    
+                    @can('ver administracion')             
                     <li class="treeview" id="lista_gest_">
                     
                         <a href="">
@@ -188,29 +201,42 @@
                         </a>
                         <ul class="treeview-menu">
                           
-                            
-                            <li class=""><a href="{{ route('proyectos.index') }}">
-                                <i class="fa fa-circle-o"></i> Proyectos</a>
-                                <input type="hidden" name="url_" id="url_" value="{{route('tareas.index')}}">
-                            </li>
+                            @can('ver proyectos')
+                                <li class=""><a href="{{ route('proyectos.index') }}">
+                                    <i class="fa fa-circle-o"></i> Proyectos</a>
+                                    <input type="hidden" name="url_" id="url_" value="{{route('proyectos.index')}}">
+                                </li>
+                            @endcan
 
-                            <li class=""><a href="{{ route('tareas.create') }}">
-                                <i class="fa fa-circle-o"></i> Crear Tareas</a>
-                            </li>
+                            @can('crear tareas')
+                                <li class=""><a href="{{ route('tareas.create') }}">
+                                    <i class="fa fa-circle-o"></i> Crear Tareas</a>
+                                </li>
+                            @endcan
 
-                            <li class="" id="{{ route('tareas.index') }}"><a href="{{ route('tareas.index') }}">
-                                <i class="fa fa-circle-o"></i> Listar Tareas</a>
-                            </li>
+                            @can('tablero de tareas')
+                                <li class="" id="{{ route('tareas.index') }}"><a href="{{ route('tareas.index') }}">
+                                    <i class="fa fa-circle-o"></i> Listar Tareas</a>
+                                </li>
+                            @endcan
 
+                            @can('ver usuarios')
+                                <li class=""><a href="{{ route('usuario.usuario') }}">
+                                    <i class="fa fa-circle-o"></i> Usuarios</a>                                 
+                                </li>
+                            @endcan    
 
-                            <li class=""><a href="{{ route('tareas.archivo') }}">
-                                <i class="fa fa-circle-o"></i> Tareas Archivadas</a>
-                            </li>
-                                
+                            @can('ver roles')
+                                <li class=""><a href="{{ route('roles.index') }}">
+                                    <i class="fa fa-circle-o"></i> Roles</a>                                 
+                                </li>
+                            @endcan    
                            
                         </ul>
                     </li>
-
+                    @endcan
+                    
+                    @can('ver mistareas')
                     <li class="treeview" id="lista_gest_1">
                     
                         <a href="">
@@ -224,17 +250,17 @@
                         </a>
                         <ul class="treeview-menu">
                           
-                            
+                           
                             <li class=""><a href="{{ route('home') }}">
                                 <i class="fa fa-circle-o"></i> Bandeja</a>
                                 <input type="hidden" name="url_" id="url_" value="{{route('home')}}"> 
                             </li>
+                          
 
                             
                         </ul>
                     </li>
-
-                    
+                    @endcan
                  
                 </ul>
             </section>
@@ -456,8 +482,7 @@
 
     @guest
     @else
-       
-        
+        @include('auth.modal_perfil')
     @endguest
 
 
@@ -487,6 +512,7 @@
     <script>
         
         function modal_perfil(){
+           
             $('#modal_perfil').modal({backdrop: 'static', keyboard: false})
             // cargaInfoPerfil()
         }

@@ -121,7 +121,7 @@ $("#form_consultar").submit(function(e){
                                     
                                                 <button type="button" class="btn btn-primary btn-xs" onclick="verDetalle(${data.id })">Ver</button>
                                                                                     
-                                                <a onclick="eliminarGestionMenu(${data.id })" class="btn btn-danger btn-xs"> Eliminar </a>
+                                               
                                         
                                         
                         `); 
@@ -248,9 +248,11 @@ function verDetalle(id){
             alertNotificar(data.mensaje,"error");
             return;   
         }
+        if(data.estadoMiTarea!=null){
+            if(data.estadoMiTarea.estado=="Completado"){
+                $('.finalizado').prop('disabled',true)
+            }
 
-        if(data.estadoMiTarea.estado=="Completado"){
-            $('.finalizado').prop('disabled',true)
         }
 
         $('#tabla_data').hide(200)

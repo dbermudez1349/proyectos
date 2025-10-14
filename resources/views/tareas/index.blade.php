@@ -89,9 +89,9 @@
                                 <thead>
                                     <tr>
                                         <!-- <th class="text-center">Documento</th> -->
-                                        <th class="text-center">Descripcion</th>
+                                        <th class="text-center">Tarea</th>
                                         
-                                        <th class="text-center">Proyecto</th>
+                                        <th class="text-center">Descripcion</th>
                                         <th class="text-center">Areas </th>
                                         <th class="text-center">Estado</th>
                                         <th class="text-center">Fecha Limite</th>

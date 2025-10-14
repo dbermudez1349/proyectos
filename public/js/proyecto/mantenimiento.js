@@ -66,8 +66,9 @@ $("#form_proyecto").submit(function(e){
 })
 
 function limpiarCampos(){
-    $('#gestion').val('').trigger('change.select2')
-    $('#menu').val('').trigger('change.select2')
+    
+    $('#nombre').val('')
+    $('#descripcion').val('')
 }
 
 function llenar_tabla_proyecto(){
@@ -100,10 +101,10 @@ function llenar_tabla_proyecto(){
                     url: 'json/datatables/spanish.json',
                 },
                 columnDefs: [
-                    { "width": "20%", "targets": 0 },
-                    { "width": "30%", "targets": 1 },
-                    { "width": "30%", "targets": 2 },
-                    { "width": "20%", "targets": 3 },
+                    { "width": "10%", "targets": 0 },
+                    { "width": "40%", "targets": 1 },
+                    { "width": "40%", "targets": 2 },
+                    { "width": "10%", "targets": 3 },
                    
                 ],
                 data: data.resultado,

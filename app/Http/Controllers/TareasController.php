@@ -210,6 +210,7 @@ class TareasController extends Controller
             ]);
 
         }catch (\Throwable $e) {
+            dd($e);
             \Log::error('TareasController => detalleTarea => mensaje => '.$e->getLine());
             return response()->json([
                 'error'=>true,
@@ -225,7 +226,7 @@ class TareasController extends Controller
             ->leftJoin('users as u', 'u.id','act.usuario_id')
             ->leftJoin('area as a', 'a.id','u.id_area')
             ->where('tarea_id',$id)
-            ->select('act.created_at','a.descripcion as area_name', 'act.comentario')
+            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id')
             ->get();
             
             return response()->json([
@@ -425,7 +426,7 @@ class TareasController extends Controller
             ]);
 
             $archivosInfo = [];
-
+            $ruta = public_path('archivos'); // public/uploads
             if ($request->hasFile('archivos')) {
                 foreach ($request->file('archivos') as $archivo) {
                   
@@ -435,11 +436,14 @@ class TareasController extends Controller
                     $extension = pathinfo($archivo->getClientOriginalName(), PATHINFO_EXTENSION);
                     $nombreLimpio=$nombreSinExtension."".time().".".$extension;
                    
+                    Storage::disk('public')->putFileAs('archivos', $archivo, $nombreLimpio);
+
                     $archivosInfo[] = [
                         'nombre' => $nombreLimpio
                     ];
                 }
             }
+           
 
             $tarea = tareas::find($request->id_tarea_act);
             $tarea->estado='En Proceso';

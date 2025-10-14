@@ -17,8 +17,8 @@ return new class extends Migration
             $table->text('descripcion')->nullable();
             $table->integer('estado');
             $table->integer('id_usuario_reg');
-            $table->integer('id_usuario_act');
-            $table->integer('id_usuario_elimina');
+            $table->integer('id_usuario_act')->nullable();
+            $table->integer('id_usuario_elimina')->nullable();
             $table->timestamps();
         });
     }

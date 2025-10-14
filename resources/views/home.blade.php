@@ -52,7 +52,7 @@
                                     <tr>
                                         <!-- <th class="text-center">Documento</th> -->
                                         
-                                        <th class="text-center">Titulo</th>
+                                        <th class="text-center">Tarea</th>
                                         <th class="text-center">Descripcion</th>
                                     
                                     

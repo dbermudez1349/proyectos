@@ -21,7 +21,7 @@ class UsersTableSeeder extends Seeder
             'name' => 'Diego Bermudez',
             'email' => 'tecnologia.informacion@sanvicente.gob.ec',
             'password' => bcrypt('123456'),
-            'id_area' => 1,
+            'id_area' => 2,
         ]);
         $user1->assignRole('Administrador');
         $user2 = User::create([
@@ -35,7 +35,7 @@ class UsersTableSeeder extends Seeder
             'name' => 'Ismael Rivero',
             'email' => 'planificacion@sanvicente.gob.ec',
             'password' => bcrypt('123456'),
-            'id_area' => 2,
+            'id_area' => 1,
         ]);
         $user3->assignRole('Director');
         $user4 = User::create([

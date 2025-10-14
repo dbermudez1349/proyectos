@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('tarea_id')->constrained()->onDelete('cascade');
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
+            $table->string('estado')->nullable();
         });
     }
 

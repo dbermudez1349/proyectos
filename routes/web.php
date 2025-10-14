@@ -4,6 +4,8 @@ use App\Http\Controllers\ProyectosController;
 use App\Http\Controllers\TareasController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\RolController;
 use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -27,13 +29,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route::post('/tareas/{tarea}/actividad', [TareasController::class, 'agregarActividad'])->middleware('auth')->name('tareas.agregarActividad');
 
-     Route::post('/agregarActividad', [TareasController::class, 'agregarActividad'])->middleware('auth')->name('tareas.agregarActividad');
+     Route::post('/agregarActividad', [TareasController::class, 'agregarActividad']);
 
     Route::get('/archivo', [TareasController::class, 'archivo'])->name('tareas.archivo');
     Route::patch('/tareas/restaurar/{tarea}', [TareasController::class, 'restaurar'])->name('tareas.restaurar');
 
     Route::get('/actividades/{id}/{archivoIndex}', [TareasController::class, 'descargarArchivo'])
     ->name('actividades.descargar');
+
+    Route::get('/usuario', [UsuarioController::class, 'index'])->name('usuario.usuario');
+    Route::get('/listado-usuario', [UsuarioController::class, 'listar']);
+    Route::post('/guardar-usuario', [UsuarioController::class, 'guardar']);
+    Route::get('/resetear-password/{id}', [UsuarioController::class, 'resetearPassword']);
+    Route::get('/editar-usuario/{id}', [UsuarioController::class, 'editar']);
+    Route::put('/actualizar-usuario/{id}', [UsuarioController::class, 'actualizar']);
+    Route::post('/cambiar-clave', [UsuarioController::class, 'cambiarClave']);
+
+
+    Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
+    Route::get('/listado-rol', [RolController::class, 'listar']);
+    Route::get('/ver-permisos-roles/{id}', [RolController::class, 'verPermisos']);
+    Route::get('/eliminar-permiso/{idpermiso}/{idrol}', [RolController::class, 'eliminarPermiso']);
+    Route::post('/guardar-permiso', [RolController::class, 'guardarPermiso']);
 
     Route::post('/logout', function() {
         Auth::logout();

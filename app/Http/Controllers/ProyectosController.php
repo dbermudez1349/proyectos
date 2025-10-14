@@ -9,9 +9,10 @@ class ProyectosController extends Controller
 {
     public function index()
     {
-        // $proyectos = Proyectos::all();
-        // return view('proyectos.index', compact('proyectos'));
-        
+       if(!Auth()->user()->hasPermissionTo('ver proyectos'))
+        {
+            abort(403, 'No tienes acceso a esta seccion.');
+        }
         return view('proyectos.index');
     }
 
@@ -128,6 +129,18 @@ class ProyectosController extends Controller
             ]);
         }
 
+        //comprobar que no tenga tareas en fase iniciada o completadas
+        $verifica=\DB::table('tareas')
+        ->where('proyecto_id',$id)
+        ->whereIn('estado',['Completada','En Proceso'])
+        ->first();
+        if(!is_null($verifica)){
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>'El proyecto no se puede actualizar porque ya esta asociado a una tarea en ejecucion o finalizado'
+            ]);
+        }
+
         if($actualiza_proyecto->save()){
             return response()->json([
                 'error'=>false,
@@ -143,18 +156,16 @@ class ProyectosController extends Controller
 
     public function destroy($id)
     {
-        // $proyecto->delete();
-        // return redirect()->route('proyectos.index')->with('success', 'Proyecto eliminado.');
-
+        //comprobar que no tenga tareas en fase iniciada o completadas
         $tieneTareaActiva=\DB::table('tareas')
         ->where('proyecto_id',$id)
-        ->where('estado',1)
+        ->whereIn('estado',['Completada','En Proceso'])
         ->first();
-
+       
         if(!is_null($tieneTareaActiva)){
             return response()->json([
                 'error'=>true,
-                'mensaje'=>'La tarea no se puede eliminar porque tiene tarea(s) asociada(s)'
+                'mensaje'=>'El proyecto no se puede eliminar porque tiene tarea(s) asociada(s) en ejecucion o finalizado'
             ]);
         }
 

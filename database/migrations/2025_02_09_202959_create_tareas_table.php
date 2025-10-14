@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('archivo')->nullable();
             $table->timestamps();
             $table->integer('id_usuario_reg');
-            $table->integer('id_usuario_act');
+            $table->integer('id_usuario_act')->nullable();
         });
     }
 

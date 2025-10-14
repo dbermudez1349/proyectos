@@ -23,6 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'id_area',
+        'estado',
     ];
 
     /**
@@ -51,5 +53,9 @@ class User extends Authenticatable
     public function tareas()
     {
         return $this->belongsToMany(tareas::class, 'tarea_usuario','usuario_id','tarea_id');
+    }
+
+    public function area(){
+        return $this->belongsTo('App\Models\Area', 'id_area', 'id');
     }
 }
