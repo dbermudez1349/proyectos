@@ -20,6 +20,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->integer('id_area')->constrained()->onDelete('cascade');
+            $table->integer('estado')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

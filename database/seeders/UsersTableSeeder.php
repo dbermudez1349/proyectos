@@ -22,6 +22,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'tecnologia.informacion@sanvicente.gob.ec',
             'password' => bcrypt('123456'),
             'id_area' => 2,
+            'estado' => 1,
         ]);
         $user1->assignRole('Administrador');
         $user2 = User::create([
@@ -29,6 +30,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'coordinacion@sanvicente.gob.ec',
             'password' => bcrypt('123456'),
             'id_area' => 3,
+            'estado' => 1,
         ]);
         $user2->assignRole('Coordinador');
         $user3 = User::create([
@@ -36,6 +38,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'planificacion@sanvicente.gob.ec',
             'password' => bcrypt('123456'),
             'id_area' => 1,
+            'estado' => 1,
         ]);
         $user3->assignRole('Director');
         $user4 = User::create([
@@ -43,6 +46,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'alcaldia@sanvicente.gob.ec',
             'password' => bcrypt('123456'),
             'id_area' => 4,
+            'estado' => 1,
         ]);
         $user4->assignRole('Alcalde');
         $user5 = User::create([
@@ -50,6 +54,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'higiene@sanvicente.gob.ec',
             'password' => bcrypt('123456'),
             'id_area' => 5,
+            'estado' => 1,
         ]);
         $user5->assignRole('Director');
         $user6 = User::create([
@@ -57,6 +62,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'accion.social@sanvicente.gob.ec',
             'password' => bcrypt('123456'),
             'id_area' => 6,
+            'estado' => 1,
         ]);
         $user6->assignRole('Director');
 
