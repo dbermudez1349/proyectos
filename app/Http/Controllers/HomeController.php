@@ -13,7 +13,23 @@ class HomeController extends Controller
     public function index()
     {
         $tareas = auth()->user()->tareas()->get();
-        return view('home', compact('tareas'));
+        // Datos simulados de ejemplo
+        $years = ['2011', '2012', '2013'];
+        $salesA = [6500, 8000, 23000];
+        $salesB = [4000, 6000, 17000];
+
+
+         // Datos para el gráfico de barras
+        $categories = ['Enero', 'Febrero', 'Marzo', 'Abril'];
+        $barValues = [12000, 19000, 3000, 5000];
+
+        return view('home', compact('tareas','years', 'salesA', 'salesB', 'categories', 'barValues'));
+    }
+
+    public function misTareas()
+    {
+        $tareas = auth()->user()->tareas()->get();
+        return view('misTareas', compact('tareas'));
     }
 
 

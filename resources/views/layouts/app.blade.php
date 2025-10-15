@@ -251,9 +251,9 @@
                         <ul class="treeview-menu">
                           
                            
-                            <li class=""><a href="{{ route('home') }}">
+                            <li class=""><a href="{{ route('misTareas') }}">
                                 <i class="fa fa-circle-o"></i> Bandeja</a>
-                                <input type="hidden" name="url_" id="url_" value="{{route('home')}}"> 
+                                <input type="hidden" name="url_" id="url_" value="{{route('misTareas')}}"> 
                             </li>
                           
 

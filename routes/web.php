@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/mis-tareas', [HomeController::class, 'misTareas'])->name('misTareas');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/tablero', [HomeController::class, 'tablero'])->name('tablero');
     Route::resource('proyectos', ProyectosController::class);
