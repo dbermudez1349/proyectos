@@ -30,7 +30,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route::post('/tareas/{tarea}/actividad', [TareasController::class, 'agregarActividad'])->middleware('auth')->name('tareas.agregarActividad');
 
-     Route::post('/agregarActividad', [TareasController::class, 'agregarActividad']);
+    Route::post('/agregarActividad', [TareasController::class, 'agregarActividad']);
+    Route::post('/agregarObservacion', [TareasController::class, 'agregarObservacion']);
 
     Route::get('/archivo', [TareasController::class, 'archivo'])->name('tareas.archivo');
     Route::patch('/tareas/restaurar/{tarea}', [TareasController::class, 'restaurar'])->name('tareas.restaurar');

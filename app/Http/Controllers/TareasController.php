@@ -165,13 +165,13 @@ class TareasController extends Controller
     public function detalleTarea($id){
         try{
             $tareas=\DB::table('tareas as t')
-                ->leftJoin('proyectos as p', 'p.id','t.proyecto_id')
+                // ->leftJoin('proyectos as p', 'p.id','t.proyecto_id')
                 ->leftJoin('tarea_usuario as tu', 'tu.tarea_id','t.id')
                 ->leftJoin('users as u', 'u.id','tu.usuario_id')
                 ->leftJoin('area as a', 'a.id','u.id_area')
                 ->where('t.estado','!=','Todos')
                 ->where('t.id',$id)
-                ->select('t.id', 't.titulo as titulo_tarea', 't.descripcion as desc_tarea', 't.estado','a.descripcion as area','t.fecha_limite','p.nombre as nombre_proy', 'p.descripcion as descrpcion_proy')
+                ->select('t.id', 't.titulo as titulo_tarea', 't.descripcion as desc_tarea', 't.estado','a.descripcion as area','t.fecha_limite')
                 ->get()
                 ->groupBy('id') // agrupa por id de tarea
                 ->map(function ($items) {
@@ -180,8 +180,8 @@ class TareasController extends Controller
                         'id' => $tarea->id,
                         'titulo_tarea' => $tarea->titulo_tarea,
                         'desc_tarea' => $tarea->desc_tarea,
-                        'nombre_proy' => $tarea->nombre_proy,
-                        'descrpcion_proy' => $tarea->descrpcion_proy,
+                        // 'nombre_proy' => $tarea->nombre_proy,
+                        // 'descrpcion_proy' => $tarea->descrpcion_proy,
                         'estado' => $tarea->estado,
                         'fecha_limite' => $tarea->fecha_limite,
                         'areas' => $items->pluck('area')->unique()->values(), // crea array de áreas sin repetir
@@ -190,10 +190,11 @@ class TareasController extends Controller
                 ->values();
 
             $actividades=\DB::table('actividades as act')
+            ->leftJoin('actividades as padre', 'act.id_padre', '=', 'padre.id')
             ->leftJoin('users as u', 'u.id','act.usuario_id')
             ->leftJoin('area as a', 'a.id','u.id_area')
-            ->where('tarea_id',$id)
-            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id')
+            ->where('act.tarea_id',$id)
+            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id','padre.comentario as descripcion_padre','padre.id as padre_id','act.usuario_id')
             ->get();
 
             $estadoMiTarea=\DB::table('tarea_usuario')
@@ -201,12 +202,21 @@ class TareasController extends Controller
             ->where('usuario_id',auth()->user()->id)
             ->select('estado')
             ->first();
+
+            $estadoTareas=\DB::table('tarea_usuario as tu')
+            ->leftJoin('users as u', 'u.id','tu.usuario_id')
+            ->leftJoin('area as a', 'a.id','u.id_area')
+            ->select('a.descripcion as area_name','tu.estado')
+            ->where('tarea_id',$id)
+            ->get();
                        
             return response()->json([
                 'error'=>false,
                 'resultado'=>$tareas,
                 'actividades'=>$actividades,
-                'estadoMiTarea'=>$estadoMiTarea
+                'estadoMiTarea'=>$estadoMiTarea,
+                'estadoTareas'=>$estadoTareas,
+                'idusuario'=>auth()->user()->id
             ]);
 
         }catch (\Throwable $e) {
@@ -223,15 +233,17 @@ class TareasController extends Controller
         try{
             
             $actividades=\DB::table('actividades as act')
+            ->leftJoin('actividades as padre', 'act.id_padre', '=', 'padre.id')
             ->leftJoin('users as u', 'u.id','act.usuario_id')
             ->leftJoin('area as a', 'a.id','u.id_area')
-            ->where('tarea_id',$id)
-            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id')
+            ->where('act.tarea_id',$id)
+            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id','padre.comentario as descripcion_padre','padre.id as padre_id','act.usuario_id')
             ->get();
             
             return response()->json([
                 'error'=>false,
-                'resultado'=>$actividades
+                'resultado'=>$actividades,
+                'idusuario'=>auth()->user()->id
             ]);
 
         }catch (\Throwable $e) {
@@ -295,7 +307,7 @@ class TareasController extends Controller
             $guarda_tarea->titulo=$request->titulo;
             $guarda_tarea->descripcion=$request->descripcion;
             $guarda_tarea->estado=1;
-            $guarda_tarea->proyecto_id= $request->proyecto;
+            // $guarda_tarea->proyecto_id= $request->proyecto;
             $guarda_tarea->fecha_limite= $request->flimite;
             $guarda_tarea->id_usuario_reg=auth()->user()->id;      
 
@@ -406,7 +418,7 @@ class TareasController extends Controller
         return back()->with('success', 'Actividad añadida.');
     }
 
-     public function agregarActividad(Request $request) {
+    public function agregarActividad(Request $request) {
         try{
             $verificaEstado=TareaUsuario::where('tarea_id',$request->id_tarea_act)
             ->where('usuario_id',auth()->user()->id)
@@ -476,6 +488,71 @@ class TareasController extends Controller
 
         }catch (\Throwable $e) {
             \Log::error('TareasController => agregarActividad => mensaje => '.$e->getMessage());
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>'Ocurrió un error '.$e
+            ]);        
+        }
+
+    }
+
+    public function agregarObservacion(Request $request) {
+        try{
+            $verificaEstado=TareaUsuario::where('tarea_id',$request->id_tarea_act)
+            ->where('usuario_id',auth()->user()->id)
+            ->where('estado','Completado')
+            ->first();
+           
+            if(!is_null($verificaEstado)){
+                return response()->json([
+                    'error'=>true,
+                    'mensaje'=>'Ya no se puede agregar mas comentario, la tarea ya fue finalizada'
+                ]);    
+            }
+
+            $request->validate([
+                'observacion' => 'nullable|string',
+                'archivos_observacion.*' => 'nullable|file|max:2048'
+            ]);
+
+            $archivosInfo = [];
+            $ruta = public_path('archivos_observacion'); // public/uploads
+            if ($request->hasFile('archivos_observacion')) {
+                foreach ($request->file('archivos_observacion') as $archivo) {
+                  
+                    $nombreOriginal = $archivo->getClientOriginalName();
+                    $nombreSinExtension = pathinfo($nombreOriginal, PATHINFO_FILENAME);
+                    
+                    $extension = pathinfo($archivo->getClientOriginalName(), PATHINFO_EXTENSION);
+                    $nombreLimpio=$nombreSinExtension."".time().".".$extension;
+                   
+                    Storage::disk('public')->putFileAs('archivos', $archivo, $nombreLimpio);
+
+                    $archivosInfo[] = [
+                        'nombre' => $nombreLimpio
+                    ];
+                }
+            }           
+
+            $tarea = tareas::find($request->id_tarea_act); 
+            // dd($tarea->actividades()->get());         
+
+            $tarea->actividades()->create([
+                'usuario_id' => auth()->id(),
+                'comentario' => $request->observacion,        
+                'archivos' => json_encode($archivosInfo),
+                'tipo' => 'Observacion',
+                'id_padre' => $request->idactividad_observacion
+            ]);
+
+            return response()->json([
+                'error' => false,
+                'mensaje' => 'Observacion añadida exitosamente.'
+            ]);
+
+
+        }catch (\Throwable $e) {
+            \Log::error('TareasController => agregarObservacion => mensaje => '.$e->getMessage());
             return response()->json([
                 'error'=>true,
                 'mensaje'=>'Ocurrió un error '.$e

@@ -201,12 +201,12 @@
                         </a>
                         <ul class="treeview-menu">
                           
-                            @can('ver proyectos')
+                            <!-- @can('ver proyectos')
                                 <li class=""><a href="{{ route('proyectos.index') }}">
                                     <i class="fa fa-circle-o"></i> Proyectos</a>
                                     <input type="hidden" name="url_" id="url_" value="{{route('proyectos.index')}}">
                                 </li>
-                            @endcan
+                            @endcan -->
 
                             @can('crear tareas')
                                 <li class=""><a href="{{ route('tareas.create') }}">

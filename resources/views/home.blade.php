@@ -59,10 +59,26 @@
       <!-- Small boxes (Stat box) -->
       <div class="row">
         <!-- cajas pequeñas -->
-        <div class="col-lg-4 col-xs-6">
+
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+            <div class="small-box bg-red">
+                <div class="inner">
+                <h3>{{sizeof($misTareasPendientesTotales)}}</h3>
+
+                <p>Mis Pendientes</p>
+                </div>
+                <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+                </div>
+                <a href="{{route('misTareas')}}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+             </div>
+        </div>
+
+        <div class="col-lg-3 col-xs-6">
             <div class="small-box bg-aqua">
             <div class="inner">
-                <h3>150</h3>
+                <h3>{{sizeof($proyectosTotales)}}</h3>
                 <p>Proyectos</p>
             </div>
             <div class="icon">
@@ -74,10 +90,10 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-xs-6">
+        <div class="col-lg-3 col-xs-6">
             <div class="small-box bg-green">
             <div class="inner">
-                <h3>53<sup style="font-size: 20px"></sup></h3>
+                <h3>{{sizeof($tareasTotales)}}<sup style="font-size: 20px"></sup></h3>
                 <p>Tareas</p>
             </div>
             <div class="icon">
@@ -89,10 +105,10 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-xs-6">
+        <div class="col-lg-3 col-xs-6">
             <div class="small-box bg-yellow">
             <div class="inner">
-                <h3>44</h3>
+                <h3>{{sizeof($usuarioTotales)}}</h3>
                 <p>Usuarios</p>
             </div>
             <div class="icon">
@@ -109,24 +125,16 @@
     <div class="row">
         <div class="col-md-6">
             <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Tareas</h3>
+                <div class="box-header with-border">
+                    <h3 class="box-title">Tareas</h3>
 
-                <!-- <div class="box-tools pull-right">
-                <button class="btn btn-box-tool" data-widget="collapse">
-                    <i class="fa fa-minus"></i>
-                </button>
-                <button class="btn btn-box-tool" data-widget="remove">
-                    <i class="fa fa-times"></i>
-                </button>
-                </div> -->
-            </div>
-
-            <div class="box-body">
-                <div class="chart">
-                <canvas id="salesChart" style="height:300px"></canvas>
                 </div>
-            </div>
+
+                <div class="box-body">
+                    <div class="chart">
+                    <canvas id="salesChart" style="height:300px"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -162,80 +170,64 @@
         $('#tituloCabecera').html('')
         //verMisTareas()
 
-         const ctx = document.getElementById('salesChart').getContext('2d');
-        const salesChart = new Chart(ctx, {
-            type: 'line',
+        
+
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
             data: {
-                labels: @json($years),
-                datasets: [
-                    {
-                        label: 'Serie A',
-                        data: @json($salesA),
-                        fill: true,
-                        backgroundColor: 'rgba(0,123,255,0.3)',
-                        borderColor: '#007bff',
-                        tension: 0.4,
-                        pointBackgroundColor: 'white',
-                        pointBorderColor: '#007bff',
-                        pointRadius: 5
-                    },
-                    {
-                        label: 'Serie B',
-                        data: @json($salesB),
-                        fill: true,
-                        backgroundColor: 'rgba(0,123,255,0.1)',
-                        borderColor: '#8bb9ff',
-                        tension: 0.4,
-                        pointBackgroundColor: 'white',
-                        pointBorderColor: '#8bb9ff',
-                        pointRadius: 5
-                    }
-                ]
+                labels: @json($labels),
+                datasets: [{
+                    label: 'Tareas últimos 6 meses',
+                    data: @json($data),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
             },
             options: {
-                plugins: {
-                    legend: { display: false }
-                },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 7500 }
-                    }
+                    y: { beginAtZero: true }
                 }
             }
         });
 
+
+     
+
         const ctxBar = document.getElementById('barChart').getContext('2d');
+
         new Chart(ctxBar, {
-        type: 'bar',
-        data: {
-            labels: @json($categories),
-            datasets: [{
-            label: 'Ventas ($)',
-            data: @json($barValues),
-            backgroundColor: [
-                'rgba(60,141,188,0.7)',
-                'rgba(0,166,90,0.7)',
-                'rgba(243,156,18,0.7)',
-                'rgba(221,75,57,0.7)'
-            ],
-            borderColor: [
-                '#3c8dbc', '#00a65a', '#f39c12', '#dd4b39'
-            ],
-            borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 5000 }
+            type: 'bar',
+            data: {
+                labels: @json($categories),
+                datasets: [{
+                    label: 'Tareas por estado',
+                    data: @json($barValues),
+                    backgroundColor: [
+                        'rgba(60,141,188,0.7)',
+                        'rgba(0,166,90,0.7)',
+                        'rgba(243,156,18,0.7)',
+                        'rgba(221,75,57,0.7)',
+                        'rgba(147,112,219,0.7)', // opcional, si tienes más estados
+                    ],
+                    borderColor: [
+                        '#3c8dbc', '#00a65a', '#f39c12', '#dd4b39', '#9370DB'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 } // Ajusta según el número de tareas
+                    }
+                }
             }
-            }
-        }
         });
        
     </script>

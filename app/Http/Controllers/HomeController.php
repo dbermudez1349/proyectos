@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\tareas;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -12,18 +13,64 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $tareas = auth()->user()->tareas()->get();
-        // Datos simulados de ejemplo
-        $years = ['2011', '2012', '2013'];
-        $salesA = [6500, 8000, 23000];
-        $salesB = [4000, 6000, 17000];
+        // $tareas = auth()->user()->tareas()->get();
+       
+        // Obtener la fecha límite (6 meses atrás desde hoy)
+        $fechaInicio = Carbon::now()->subMonths(6);
+
+        // Consultar las tareas agrupadas por mes y contar cuántas hay por cada uno
+        $tareas = \DB::table('tareas')
+            ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
+            ->where('created_at', '>=', $fechaInicio)
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();
+
+        // Transformar los resultados en arreglos para usar en el gráfico
+        $meses = [];
+        $totales = [];
+
+        foreach ($tareas as $t) {
+            // Formatear el nombre del mes
+            $meses[] = Carbon::create()->month($t->mes)->format('F');
+            $totales[] = $t->total;
+        }
+
+        $labels = $meses;   // ej. ['Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre']
+        $data = $totales;
+
+       
+        $tareasPorEstado = \DB::table('tareas')
+        ->select('estado', \DB::raw('COUNT(*) as total'))
+        ->groupBy('estado')
+        ->get();
+
+        // Convertimos a arrays para pasar a Chart.js
+        $categories = $tareasPorEstado->pluck('estado');
+        $barValues = $tareasPorEstado->pluck('total');
+
+        $tareasTotales=\DB::table('tareas')
+        ->get();
+
+        $misTareasPendientesTotales=\DB::table('tarea_usuario')
+        ->where('usuario_id', auth()->user()->id)
+        ->where(function($q) {
+            $q->where('estado', '<>', 'Eliminado')
+            ->orWhereNull('estado');
+        })
+        ->get();
+
+        $proyectosTotales=\DB::table('proyectos')
+        ->where('estado',1)
+        ->get();
+
+        $usuarioTotales=\DB::table('users')
+        ->where('estado',1)
+        ->get();
 
 
-         // Datos para el gráfico de barras
-        $categories = ['Enero', 'Febrero', 'Marzo', 'Abril'];
-        $barValues = [12000, 19000, 3000, 5000];
-
-        return view('home', compact('tareas','years', 'salesA', 'salesB', 'categories', 'barValues'));
+        return view('home', compact('labels','data', 'categories', 'barValues','tareasTotales',
+        'proyectosTotales','usuarioTotales','misTareasPendientesTotales'));
     }
 
     public function misTareas()
