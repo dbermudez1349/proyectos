@@ -185,7 +185,7 @@
     </div>
 
     <div id="detalle_data" style="display:none">
-        <section class="content" id="content_detalle_proyecto" style="min-height: 0px; margin-bottom:-40px">
+        <!-- <section class="content" id="content_detalle_proyecto" style="min-height: 0px; margin-bottom:-40px">
             <div class="box" id="listado_persona">
                 <div class="box-header with-border">
                     <h3 class="box-title" id="tituloCabecera"><b>DETALLE PROYECTO</b></h3>
@@ -215,7 +215,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <section class="content" id="content_detalle_proyecto" style="min-height: 0px; margin-bottom:-40px">
             <div class="box" id="actividades-13">
@@ -245,6 +245,12 @@
                         <div class="col-md-6">
                             <ul class="nav nav-pills nav-stacked"style="margin-left:0px">
                                 <li style="border-color: white"><a><i class="fa fa-indent text-blue"></i> <b class="text-black" style="font-weight: 650 !important">Descripcion</b>: <span  id="descripcion_tarea">
+                                        </span></a></li>
+                                
+                            </ul>
+
+                            <ul class="nav nav-pills nav-stacked"style="margin-left:0px">
+                                <li style="border-color: white"><a><i class="fa fa-indent text-blue"></i> <b class="text-black" style="font-weight: 650 !important">Estado Tarea</b>: <span  id="estado_tarea">
                                         </span></a></li>
                                 
                             </ul>
@@ -483,6 +489,111 @@
 
                     </div>
 
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="modal fade_ detalle_class" id="modal_Estado" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">MOTIVO REVERSION</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <form class="form-horizontal" id="form_registro_reversion" autocomplete="off" method="post" action="">
+                                {{ csrf_field() }}
+
+                                <div class="form-group">
+
+                                    <label for="inputPassword3" class="col-sm-3 control-label">Motivo</label>
+                                    <div class="col-sm-7">
+                                        <input type="hidden" name="id_tarea_usuario" id="id_tarea_usuario">
+                                        <textarea minlength="1" maxlength="500"
+                                            onKeyPress="if(this.value.length==500) return false;"
+                                            class="form-control act_user" id="motivo_reversion" name="motivo_reversion" placeholder="Ingrese el motivo de reversion"></textarea>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-12 col-md-offset-3 ">
+
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            Guardar
+                                        </button>
+                                        <button type="button" onclick="cancelarReversion()"
+                                            class="btn btn-danger btn-sm">Cancelar</button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="modal fade_ detalle_class" id="modal_DetalleReversion" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">DETALLE REVERSION</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12" id="content_proyecto" style="text-aling:center !important">
+                            <div class="col-md-6">
+                                <ul class="nav nav-pills nav-stacked"style="margin-left:0px">
+                                    <li style="border-color: white"><a><i class="fa fa-user text-blue"></i> <b class="text-black" style="font-weight: 650 !important">Usuario Revierte</b>: <span  id="usuario_revierte">
+                                            </span></a></li>
+                                    
+                                </ul>
+
+                                <ul class="nav nav-pills nav-stacked"style="margin-left:0px">
+                                    <li style="border-color: white"><a><i class="fa fa-edit text-blue"></i> <b class="text-black" style="font-weight: 650 !important">Motivo Revierte</b>: <span  id="motivo_revierte">
+                                            </span></a></li>
+                                    
+                                </ul>
+                            
+                            </div>  
+
+                            <div class="col-md-6">
+                                <ul class="nav nav-pills nav-stacked"style="margin-left:0px">
+                                    <li style="border-color: white"><a><i class="fa fa-calendar text-blue"></i> <b class="text-black" style="font-weight: 650 !important">Fecha Revierte</b>: <span  id="fecha_revierte">
+                                            </span></a></li>
+                                    
+                                </ul>
+                                
+                            </div>  
+                            
+                    
+                        </div>
+                        <div class="col-md-12">
+                            <center>
+                                <button type="button" onclick="cerrarDetalleReversion()"
+                                        class="btn btn-danger btn-sm">Cerrar</button>
+                            </center>
+                        </div>
+                    </div>
 
                 </div>
 

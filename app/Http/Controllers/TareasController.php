@@ -124,6 +124,63 @@ class TareasController extends Controller
         }
     }
 
+    public function revertirEstado(Request $request){
+        
+        try{
+            $revierte=TareaUsuario::where('id',$request->id_tarea_usuario)
+            ->first();
+            if(!is_null($revierte)){
+                if($revierte->estado=='Atendido'){
+                     return [
+                        'error'=>true,
+                        'mensaje'=>'No se puede revertir una tarea que aun no ha sido completada'
+                    ]; 
+                }
+                if($revierte->estado=='Revertido'){
+                    return [
+                        'error'=>true,
+                        'mensaje'=>'La tarea ya se encuentra revertida'
+                    ]; 
+                }
+                $revierte->estado='Revertido';
+                $revierte->idusuario_revierte=auth()->user()->id;
+                $revierte->fecha_reversion=date('Y-m-d H:i:s');
+                $revierte->motivo=$request->motivo_reversion;
+                $revierte->save();
+
+                $revierteTareaPrincipal=tareas::find($revierte->tarea_id);
+                $revierteTareaPrincipal->estado='En Proceso';
+                $revierteTareaPrincipal->save();
+
+                $estadoTareas=\DB::table('tarea_usuario as tu')
+                ->leftJoin('users as u', 'u.id','tu.usuario_id')
+                ->leftJoin('area as a', 'a.id','u.id_area')
+                ->select('a.descripcion as area_name','tu.estado','tu.id')
+                ->where('tarea_id',$revierte->tarea_id)
+                ->get();
+
+                return [
+                    'error'=>false,
+                    'mensaje'=>'La tarea fue revertida exitosamente',
+                    'estadoTareas'=>$estadoTareas,
+                    'idTarea'=>$revierte->tarea_id
+                ]; 
+            }
+            
+            return [
+                'error'=>true,
+                'mensaje'=>'No se encontro la tarea para revertir con  ID '.$request->id
+            ]; 
+
+        }catch (\Throwable $e) {
+            \Log::error('TareasController => revertirEstado => mensaje => '.$e->getMessage());
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>'Ocurrió un error '.$e
+            ]);        
+        }
+    }
+
     public function buscarMisTareas(){
         try{
             $tareas=\DB::table('tareas as t')
@@ -194,8 +251,19 @@ class TareasController extends Controller
             ->leftJoin('users as u', 'u.id','act.usuario_id')
             ->leftJoin('area as a', 'a.id','u.id_area')
             ->where('act.tarea_id',$id)
-            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id','padre.comentario as descripcion_padre','padre.id as padre_id','act.usuario_id')
+            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id','padre.comentario as descripcion_padre','padre.id as padre_id','act.usuario_id','act.tarea_id','act.usuario_id')
             ->get();
+          
+            foreach($actividades as $key=> $data){
+                $verificaEstado=\DB::table('tarea_usuario')
+                ->where('tarea_id',$data->tarea_id)
+                ->where('usuario_id',$data->usuario_id)
+                ->select('estado')
+                ->first();
+                if(!is_null($verificaEstado)){
+                    $actividades[$key]->estadoTask=$verificaEstado->estado;
+                }
+            }
 
             $estadoMiTarea=\DB::table('tarea_usuario')
             ->where('tarea_id',$id)
@@ -206,7 +274,7 @@ class TareasController extends Controller
             $estadoTareas=\DB::table('tarea_usuario as tu')
             ->leftJoin('users as u', 'u.id','tu.usuario_id')
             ->leftJoin('area as a', 'a.id','u.id_area')
-            ->select('a.descripcion as area_name','tu.estado')
+            ->select('a.descripcion as area_name','tu.estado','tu.id')
             ->where('tarea_id',$id)
             ->get();
                        
@@ -237,8 +305,19 @@ class TareasController extends Controller
             ->leftJoin('users as u', 'u.id','act.usuario_id')
             ->leftJoin('area as a', 'a.id','u.id_area')
             ->where('act.tarea_id',$id)
-            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id','padre.comentario as descripcion_padre','padre.id as padre_id','act.usuario_id')
+            ->select('act.created_at','a.descripcion as area_name', 'act.comentario','act.archivos','act.id','padre.comentario as descripcion_padre','padre.id as padre_id','act.usuario_id','act.tarea_id','act.usuario_id')
             ->get();
+
+            foreach($actividades as $key=> $data){
+                $verificaEstado=\DB::table('tarea_usuario')
+                ->where('tarea_id',$data->tarea_id)
+                ->where('usuario_id',$data->usuario_id)
+                ->select('estado')
+                ->first();
+                if(!is_null($verificaEstado)){
+                    $actividades[$key]->estadoTask=$verificaEstado->estado;
+                }
+            }
             
             return response()->json([
                 'error'=>false,
@@ -248,6 +327,30 @@ class TareasController extends Controller
 
         }catch (\Throwable $e) {
             \Log::error('TareasController => listarActividad => mensaje => '.$e->getLine());
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>'Ocurrió un error '.$e
+            ]);        
+        }
+    }
+
+    public function verReversion($id){
+        try{
+            
+            $detalleReversion=\DB::table('tarea_usuario as tu')
+            ->leftJoin('users as u', 'u.id','tu.usuario_id')
+            ->leftJoin('area as a', 'a.id','u.id_area')
+            ->where('tu.id',$id)
+            ->select('tu.fecha_reversion','tu.motivo','a.descripcion as area_name')
+            ->first();
+            
+            return response()->json([
+                'error'=>false,
+                'resultado'=>$detalleReversion,
+            ]);
+
+        }catch (\Throwable $e) {
+            \Log::error('TareasController => verReversion => mensaje => '.$e->getLine());
             return response()->json([
                 'error'=>true,
                 'mensaje'=>'Ocurrió un error '.$e
@@ -423,6 +526,17 @@ class TareasController extends Controller
             $verificaEstado=TareaUsuario::where('tarea_id',$request->id_tarea_act)
             ->where('usuario_id',auth()->user()->id)
             ->where('estado','Completado')
+            ->first();
+           
+            if(!is_null($verificaEstado)){
+                return response()->json([
+                    'error'=>true,
+                    'mensaje'=>'Ya no se puede agregar mas actividad, la tarea ya fue finalizada'
+                ]);    
+            }
+
+            $verificaEstado=tareas::where('id',$request->id_tarea_act)
+            ->where('estado','Completada')
             ->first();
            
             if(!is_null($verificaEstado)){

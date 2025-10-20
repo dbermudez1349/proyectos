@@ -23,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/detalle-tarea/{id}', [TareasController::class, 'detalleTarea']);
     Route::get('/actualizar-actividad/{id}', [TareasController::class, 'listarActividad']);
     Route::get('/finalizar-tarea/{id}', [TareasController::class, 'finalizarTarea']);
+    Route::post('/revertirEstado', [TareasController::class, 'revertirEstado']);
+    Route::get('/ver-detalle-reversion/{id}', [TareasController::class, 'verReversion']);
     
 
     Route::post('/tareas/{tarea}/completar', [TareasController::class, 'completar'])->name('tareas.completar');

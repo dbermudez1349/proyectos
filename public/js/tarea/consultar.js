@@ -262,6 +262,13 @@ function verDetalle(id) {
 
         }
 
+        if(data.resultado[0].estado=='Completada'){
+            $('.finalizado').prop('disabled', true)
+            
+        }
+
+        $('#estado_tarea').html(data.resultado[0].estado)
+
         $('#tabla_data').hide(200)
         $('#detalle_data').show(200)
 
@@ -352,6 +359,12 @@ function verDetalle(id) {
                 disabled='disabled'
             }
 
+            if(item.estadoTask){
+                if(item.estadoTask=='Completado'){
+                    disabled='disabled'
+                }
+            }
+
             $('#content_proyecto_act').append(`
                 <ul class="timeline" id="actividad-${item.id}">
 
@@ -404,6 +417,7 @@ function verDetalle(id) {
                             <span style="
                                 background-color: ${item.estado === 'Atendido' ? '#f39c12' :
                                     item.estado === 'Completado' ? '#28a745' :
+                                    item.estado === 'Revertido' ? '#ec4b4bff' :
                                         '#6c757d'};
                                 color: white;
                                 padding: 3px 8px;
@@ -421,12 +435,16 @@ function verDetalle(id) {
                         
                             ${
                                 item.estado === 'Completado'
-                                ? `<button class="btn btn-warning btn-sm btnRevertir" data-id="${item.id}" >
+                                ? `<button class="btn btn-warning btn-sm btnRevertir" data-id="${item.id}"  onclick="revertirCompletado(${item.id})">
                                         <i class="fa fa-undo"></i>
                                 </button>`
                                 : item.estado === 'Atendido'
                                 ? `<button class="btn btn-success btn-sm btnCompletar" data-id="${item.id}" >
                                         <i class="fa fa-check"></i>
+                                </button>`
+                                : item.estado === 'Revertido'
+                                ? `<button class="btn btn-danger btn-sm btnCompletar" data-id="${item.id}"  onclick="verReversion(${item.id})">
+                                        <i class="fa fa-eye"></i>
                                 </button>`
                                 : `<button class="btn btn-primary btn-sm btnAtender" data-id="${item.id}">
                                         <i class="fa fa-edit"></i>
@@ -444,27 +462,174 @@ function verDetalle(id) {
 
 }
 
-function irAActividad(id) {
-    // const target = '#actividad-' + id;    
-    // $('html,body').animate({scrollTop:$(target).offset().top},400);
-
+function irAActividad(id) {    
     const target = '#actividad-' + id;
 
-$('html,body').animate({ scrollTop: $(target).offset().top },10, function() {
-    $(target).css({
-        'outline': '5px solid red',  // borde amarillo
-        'transition': 'outline 3.5s'
+    $('html,body').animate({ scrollTop: $(target).offset().top },10, function() {
+        $(target).css({
+            'outline': '5px solid red',  // borde amarillo
+            'transition': 'outline 3.5s'
+        });
+
+        setTimeout(() => {
+            $(target).css('outline', '');
+        }, 1500);
     });
-
-    setTimeout(() => {
-        $(target).css('outline', '');
-    }, 1500);
-});
-
 }
 
+function verReversion(id){
+    $('#usuario_revierte').html('')
+    $('#motivo_revierte').html('')
+    $('#fecha_revierte').html('')
+    vistacargando("m", "Espere por favor...")
+    $.get("ver-detalle-reversion/" + id, function (data) {
+        vistacargando("")
+        console.log(data)
+        if (data.error == true) {
+            alertNotificar(data.mensaje, "error");
+            return;
+        }
+
+        $('#usuario_revierte').html(data.resultado.area_name)
+        $('#motivo_revierte').html(data.resultado.motivo)
+        $('#fecha_revierte').html(data.resultado.fecha_reversion)
+
+        $("#modal_DetalleReversion").modal('show')
+
+    }).fail(function () {
+        alertNotificar("Se produjo un error, por favor intentelo más tarde", "error");
+    });
+
+   
+}
+
+function cerrarDetalleReversion(){
+    $("#modal_DetalleReversion").modal('hide')
+}
+function revertirCompletado(id){
+    $('#id_tarea_usuario').val(id)
+    $('#motivo_reversion').val('')
+    $("#modal_Estado").modal('show')
+}
+function cancelarReversion(){
+    $("#modal_Estado").modal('hide')
+}
+
+$("#form_registro_reversion").submit(function (e) {
+    e.preventDefault();
+
+    //validamos los campos obligatorios
+    let observacion = $('#motivo_reversion').val()
+   
+    if (observacion == "" || observacion == null) {
+        alertNotificar("Debe ingresar el motivo", "error")
+        $('#motivo_reversion').focus()
+        return
+    }
+
+    vistacargando("m", "Espere por favor")
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
 
 
+    let tipo = "POST"
+    let url_form = "revertirEstado"
+
+    // var FrmData=$("#form_registro_act").serialize();
+    var FrmData = new FormData(this);
+
+    $.ajax({
+
+        type: tipo,
+        url: url_form,
+        method: tipo,
+        data: FrmData,
+        // processData:false, 
+        contentType: false,
+        cache: false,
+        processData: false,
+
+        success: function (data) {
+            vistacargando("");
+            if (data.error == true) {
+                alertNotificar(data.mensaje, 'error');
+                return;
+            }
+
+            if (data.error == false) {
+                $("#tabla_estado tbody").html('');
+                $('#tabla_estado tbody').empty();
+
+                alertNotificar(data.mensaje, 'success');
+                
+
+                $.each(data.estadoTareas, function (i, item) {
+                    $('#tabla_estado').append(`<tr>
+                                
+                                <td style="width:40%; text-align:center; vertical-align:middle">
+                                    ${item.area_name}
+                                                    
+                                </td>
+
+                                <td style="width:40%; text-align:center; vertical-align:middle">
+                                
+                                    <span style="
+                                        background-color: ${item.estado === 'Atendido' ? '#f39c12' :
+                                            item.estado === 'Completado' ? '#28a745' : 
+                                            item.estado === 'Revertido' ? '#ec4b4bff' :
+                                                '#6c757d'};
+                                        color: white;
+                                        padding: 3px 8px;
+                                        border-radius: 10px;
+                                        font-size: 12px;
+                                        font-weight: 600;
+                                        display: inline-block;
+                                        min-width: 80px;
+                                    ">
+                                        ${item.estado ? item.estado : 'Pendiente'}
+                                    </span>
+                                                        
+                                </td>
+                                <td style="width:20%; text-align:center; vertical-align:middle">
+                                
+                                    ${
+                                        item.estado === 'Completado'
+                                        ? `<button class="btn btn-warning btn-sm btnRevertir" data-id="${item.id}"  onclick="revertirCompletado(${item.id})">
+                                                <i class="fa fa-undo"></i>
+                                        </button>`
+                                        : item.estado === 'Atendido'
+                                        ? `<button class="btn btn-success btn-sm btnCompletar" data-id="${item.id}" >
+                                                <i class="fa fa-check"></i>
+                                        </button>`
+                                        : item.estado === 'Revertido'
+                                        ? `<button class="btn btn-danger btn-sm btnCompletar" data-id="${item.id}" >
+                                                <i class="fa fa-eye"></i>
+                                        </button>`
+                                        : `<button class="btn btn-primary btn-sm btnAtender" data-id="${item.id}">
+                                                <i class="fa fa-eye"></i>
+                                        </button>`
+                                    }
+                                                        
+                                </td>
+
+                        </tr>`);
+                })
+
+                actualizarActividad(data.idTarea)
+                cancelarReversion()
+            }
+
+        }, error: function (data) {
+            console.log(data)
+
+            vistacargando("");
+            alertNotificar('Ocurrió un error', 'error');
+        }
+    });
+})
 
 
 function comentar(id){
@@ -706,6 +871,11 @@ function actualizarActividad(id_tarea) {
                 disabled='disabled'
             }
 
+            if(item.estadoTask){
+                if(item.estadoTask=='Completado'){
+                    disabled='disabled'
+                }
+            }
 
             $('#content_proyecto_act').append(`
                 <ul class="timeline" id="actividad-${item.id}">
