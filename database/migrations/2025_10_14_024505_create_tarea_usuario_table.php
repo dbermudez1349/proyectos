@@ -17,6 +17,9 @@ return new class extends Migration
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
             $table->string('estado')->nullable();
+            $table->integer('idusuario_revierte')->nullable();
+            $table->dateTime('fecha_reversion')->nullable();
+            $table->text('motivo')->nullable();
         });
     }
 

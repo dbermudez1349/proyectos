@@ -212,6 +212,8 @@
 
                             </ul>
 
+                            
+
                         </div>
 
                         <div class="col-md-6">
@@ -221,6 +223,12 @@
                                             id="descripcion_tarea">
                                         </span></a></li>
 
+                            </ul>
+
+                            <ul class="nav nav-pills nav-stacked"style="margin-left:0px">
+                                <li style="border-color: white"><a><i class="fa fa-indent text-blue"></i> <b class="text-black" style="font-weight: 650 !important">Estado Tarea</b>: <span  id="estado_tarea">
+                                        </span></a></li>
+                                
                             </ul>
 
                         </div>
@@ -292,6 +300,12 @@
 
                                     </table>
                                 </div>
+                                <div class="box-footer">
+                                    <center>
+                                        <button type="button" onclick="regresarListar()"
+                                            class="btn btn-danger">Regresar</button>
+                                    </center>
+                                </div>
                             </div>
                             <!-- /.tab-pane -->
                             <div class="tab-pane" id="tab_3">
@@ -315,6 +329,12 @@
                                         </tbody>
 
                                     </table>
+                                </div>
+                                <div class="box-footer">
+                                    <center>
+                                        <button type="button" onclick="regresarListar()"
+                                            class="btn btn-danger">Regresar</button>
+                                    </center>
                                 </div>
                             </div>
                             <!-- /.tab-pane -->

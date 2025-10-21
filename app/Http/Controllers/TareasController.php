@@ -736,9 +736,18 @@ class TareasController extends Controller
                 ]);
             }
 
+            $estadoTareas=\DB::table('tarea_usuario as tu')
+            ->leftJoin('users as u', 'u.id','tu.usuario_id')
+            ->leftJoin('area as a', 'a.id','u.id_area')
+            ->select('a.descripcion as area_name','tu.estado','tu.id')
+            ->where('tarea_id',$id)
+            ->get();
+
+
             return response()->json([
                 'error' => false,
-                'mensaje' => 'Tarea Completada Exitosamente'
+                'mensaje' => 'Tarea Completada Exitosamente',
+                'estadoTareas'=>$estadoTareas
             ]);
 
         }catch (\Throwable $e) {

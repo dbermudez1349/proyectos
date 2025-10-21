@@ -163,7 +163,7 @@ function verMisTareas() {
     $("#tabla_proyecto tbody").html(`<tr><td colspan="${num_col}" style="padding:40px; 0px; font-size:20px;"><center><span class="spinner-border" role="status" aria-hidden="true"></span><b> Obteniendo información</b></center></td></tr>`);
 
     $.get("mis-proyectos-listar/", function (data) {
-        console.log(data)
+       
         if (data.error == true) {
             alertNotificar(data.mensaje, "error");
             $("#tabla_proyecto tbody").html(`<tr><td colspan="${num_col}" style="padding:40px; 0px; font-size:20px;"><center>No se encontraron datos</center></td></tr>`);
@@ -250,11 +250,12 @@ function verDetalle(id) {
     vistacargando("m", "Espere por favor...")
     $.get("detalle-tarea/" + id, function (data) {
         vistacargando("")
-        console.log(data)
+       
         if (data.error == true) {
             alertNotificar(data.mensaje, "error");
             return;
         }
+        $('.finalizado').prop('disabled', false)
         if (data.estadoMiTarea != null) {
             if (data.estadoMiTarea.estado == "Completado") {
                 $('.finalizado').prop('disabled', true)
@@ -284,7 +285,7 @@ function verDetalle(id) {
 
         $.each(data.actividades, function (i, item) {
 
-            console.log(item)
+           
             let archivos = [];
 
             if (item.archivos) {
@@ -306,7 +307,7 @@ function verDetalle(id) {
             if (archivos.length > 0) {
                 listaArchivos = '<ul>';
                 $.each(archivos, function (i2, archivo) {
-                    console.log(archivo)
+                   
                     let url = 'actividades/' + id_act + '/' + i2;
                     listaArchivos += `
                         <li>
@@ -484,7 +485,7 @@ function verReversion(id){
     vistacargando("m", "Espere por favor...")
     $.get("ver-detalle-reversion/" + id, function (data) {
         vistacargando("")
-        console.log(data)
+        
         if (data.error == true) {
             alertNotificar(data.mensaje, "error");
             return;
@@ -564,7 +565,7 @@ $("#form_registro_reversion").submit(function (e) {
                 $('#tabla_estado tbody').empty();
 
                 alertNotificar(data.mensaje, 'success');
-                
+                 $('#estado_tarea').html('')
 
                 $.each(data.estadoTareas, function (i, item) {
                     $('#tabla_estado').append(`<tr>
@@ -620,6 +621,8 @@ $("#form_registro_reversion").submit(function (e) {
 
                 actualizarActividad(data.idTarea)
                 cancelarReversion()
+                $('#estado_tarea').html('En Proceso')
+                $("#form_consultar").submit()
             }
 
         }, error: function (data) {
@@ -818,7 +821,7 @@ function actualizarActividad(id_tarea) {
             if (archivos.length > 0) {
                 listaArchivos = '<ul>';
                 $.each(archivos, function (i2, archivo) {
-                    console.log(archivo)
+                   
                     let url = 'actividades/' + id_act + '/' + i2;
                     listaArchivos += `
                         <li>
@@ -932,6 +935,75 @@ function finalizarActividad() {
             alertNotificar(data.mensaje, "success");
             $('.finalizado').prop('disabled', true)
             verMisTareas()
+            
+            $('#tabla_estado tbody').html('');
+            $('#tabla_estado tbody').empty();
+
+            let cantidad_tareas=data.estadoTareas
+            cantidad_tareas=cantidad_tareas.length
+
+            let cantidad_completados=0
+            $.each(data.estadoTareas, function (i, item) {
+                if(item.estado=='Completado'){
+                    cantidad_completados=cantidad_completados+1
+                }
+                $('#tabla_estado').append(`<tr>
+                            
+                            <td style="width:40%; text-align:center; vertical-align:middle">
+                                ${item.area_name}
+                                                
+                            </td>
+
+                            <td style="width:40%; text-align:center; vertical-align:middle">
+                            
+                                <span style="
+                                    background-color: ${item.estado === 'Atendido' ? '#f39c12' :
+                                        item.estado === 'Completado' ? '#28a745' : 
+                                        item.estado === 'Revertido' ? '#ec4b4bff' :
+                                            '#6c757d'};
+                                    color: white;
+                                    padding: 3px 8px;
+                                    border-radius: 10px;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    display: inline-block;
+                                    min-width: 80px;
+                                ">
+                                    ${item.estado ? item.estado : 'Pendiente'}
+                                </span>
+                                                    
+                            </td>
+                            <td style="width:20%; text-align:center; vertical-align:middle">
+                            
+                                ${
+                                    item.estado === 'Completado'
+                                    ? `<button class="btn btn-warning btn-sm btnRevertir" data-id="${item.id}"  onclick="revertirCompletado(${item.id})">
+                                            <i class="fa fa-undo"></i>
+                                    </button>`
+                                    : item.estado === 'Atendido'
+                                    ? `<button class="btn btn-success btn-sm btnCompletar" data-id="${item.id}" >
+                                            <i class="fa fa-check"></i>
+                                    </button>`
+                                    : item.estado === 'Revertido'
+                                    ? `<button class="btn btn-danger btn-sm btnCompletar" data-id="${item.id}" >
+                                            <i class="fa fa-eye"></i>
+                                    </button>`
+                                    : `<button class="btn btn-primary btn-sm btnAtender" data-id="${item.id}">
+                                            <i class="fa fa-eye"></i>
+                                    </button>`
+                                }
+                                                    
+                            </td>
+
+                    </tr>`);
+            })
+            if(cantidad_completados==cantidad_tareas){
+                $('#estado_tarea').html('Completada')
+            }else{
+                $('#estado_tarea').html('En Proceso')
+            }
+           
+
         }).fail(function () {
             vistacargando("")
             alertNotificar("Se produjo un error, por favor intentelo más tarde", "error");
